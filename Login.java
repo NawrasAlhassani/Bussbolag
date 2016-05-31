@@ -1,9 +1,14 @@
-package gui;
+package Tour;
 
 import java.awt.BorderLayout;
 import java.awt.Choice;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,8 +33,14 @@ public class Login extends JPanel{
 	    add(text, BorderLayout.WEST);
 	    add(users, BorderLayout.CENTER);
 	    add(btnlog, BorderLayout.SOUTH);
-	    users.add("Atilla");
-	    users.add("Nawras");
+	    users.getName();
+	}
+	
+	public void Loginn() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException{
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bussbolag?user=root&password=");
+        PreparedStatement stmt = conn.prepareStatement("");
+        ResultSet rs = stmt.executeQuery("select Name from resenar");
 	}
 
 	public void start() {
