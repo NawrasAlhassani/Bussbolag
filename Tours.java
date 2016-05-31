@@ -1,4 +1,4 @@
-package gui;
+package Tour;
 
 import javax.swing.JOptionPane;
 
@@ -25,9 +25,7 @@ public class Tours {
 	}
 			
 	public static void main(String[] args) {
-		Tours time1 = new Tours("1. 3/6 kl.14:45 \n2. 5/6 kl.16:00");
-		Tours time2 = new Tours("5/6 kl.16:00"); 
+		Tours time1 = new Tours("");
 		time1.test();
-		time2.bokning();
 	}	
 }

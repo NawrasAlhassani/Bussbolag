@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Choice;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,7 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class Login extends JPanel{
+public class Login extends JPanel implements ActionListener{
 	JLabel header = new JLabel("Blomstermåla Bussbolag");
 	JLabel text = new JLabel("Välj någon av de registrerade användarna för att logga in:   ");
 	Choice users = new Choice();
@@ -25,7 +27,7 @@ public class Login extends JPanel{
 	Font font = new Font("Monotype Corsiva", Font.BOLD, 30);
 	
 	
-	public Login (){
+	public Login () throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException{
 		setPreferredSize(new Dimension(500, 400));
 		setLayout(new BorderLayout());
 		
@@ -35,11 +37,8 @@ public class Login extends JPanel{
 	    add(text, BorderLayout.WEST);
 	    add(users, BorderLayout.CENTER);
 	    add(btnlog, BorderLayout.SOUTH);
-	    users.
-	}
-	
-	public List Login1() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException{
-        
+	    btnlog.addActionListener(this);
+	    
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bussbolag?user=root&password=");
         PreparedStatement stmt = conn.prepareStatement("select Namn from resenar");
@@ -48,16 +47,25 @@ public class Login extends JPanel{
         while (rs.next()){
         	reslist.add(rs.getString(1));
         	
-        }
-        return reslist;
-        
+        for(int i = 0; i < reslist.size(); i++){
+    	        users.add((String) reslist.get(i));
+       }
+      }
+     }
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnlog){
+			JFrame fr = new JFrame();
+			fr.pack();
+			fr.setVisible(true);
+			fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			fr.add(new ChoiceTour());
+			fr.setSize(500, 400);
+		}
+
 	}
 	
-	public void setReslist(List reslist){
-		List rslist = reslist;
-	}
-
-	public void start() {
+	
+	public void start() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		JFrame frame = new JFrame("Bussbolag");
 		frame.pack();
 		frame.setVisible(true);
@@ -67,9 +75,15 @@ public class Login extends JPanel{
 		
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		Login log = new Login();
 		log.start();
 	}
+
+
+
+
+	
+	
 
 }
