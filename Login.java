@@ -9,6 +9,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -33,14 +35,26 @@ public class Login extends JPanel{
 	    add(text, BorderLayout.WEST);
 	    add(users, BorderLayout.CENTER);
 	    add(btnlog, BorderLayout.SOUTH);
-	    users.getName();
+	    users.
 	}
 	
-	public void Loginn() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException{
-        Class.forName("com.mysql.jdbc.Driver").newInstance();
+	public List Login1() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException{
+        
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bussbolag?user=root&password=");
-        PreparedStatement stmt = conn.prepareStatement("");
-        ResultSet rs = stmt.executeQuery("select Name from resenar");
+        PreparedStatement stmt = conn.prepareStatement("select Namn from resenar");
+        ResultSet rs = stmt.executeQuery();
+        List reslist = new ArrayList();
+        while (rs.next()){
+        	reslist.add(rs.getString(1));
+        	
+        }
+        return reslist;
+        
+	}
+	
+	public void setReslist(List reslist){
+		List rslist = reslist;
 	}
 
 	public void start() {
