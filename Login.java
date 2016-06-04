@@ -19,52 +19,64 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class Login extends JPanel implements ActionListener{
+public class Login extends JPanel implements ActionListener {
 	JLabel header = new JLabel("Blomstermåla Bussbolag");
 	JLabel text = new JLabel("Välj någon av de registrerade användarna för att logga in:   ");
 	Choice users = new Choice();
 	JButton btnlog = new JButton("Logga in");
 	Font font = new Font("Monotype Corsiva", Font.BOLD, 30);
-	
-	
-	public Login () throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException{
+	List<Integer> resenarID = new ArrayList<Integer>();
+	Connection myConn;
+
+	public Login() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		setPreferredSize(new Dimension(500, 400));
 		setLayout(new BorderLayout());
-		
+
 		header.setFont(font);
-		
+
 		add(header, BorderLayout.NORTH);
-	    add(text, BorderLayout.WEST);
-	    add(users, BorderLayout.CENTER);
-	    add(btnlog, BorderLayout.SOUTH);
-	    btnlog.addActionListener(this);
-	    
-		Class.forName("com.mysql.jdbc.Driver").newInstance();
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/bussbolag?user=root&password=");
-        PreparedStatement stmt = conn.prepareStatement("select Namn from resenar");
-        ResultSet rs = stmt.executeQuery();
-        List reslist = new ArrayList();
-        while (rs.next()){
-        	reslist.add(rs.getString(1));
-        	
-        for(int i = 0; i < reslist.size(); i++){
-    	        users.add((String) reslist.get(i));
-       }
-      }
-     }
+		add(text, BorderLayout.WEST);
+		add(users, BorderLayout.CENTER);
+		add(btnlog, BorderLayout.SOUTH);
+		btnlog.addActionListener(this);
+		
+		Connect();
+		PreparedStatement stmt = myConn.prepareStatement("select ResenarID, Namn from resenar");
+		ResultSet rs = stmt.executeQuery();
+		List<String> reslist = new ArrayList<String>();
+
+		while (rs.next()) {
+			resenarID.add(rs.getInt(1));
+			reslist.add(rs.getString(2));
+		}
+
+		for (int i = 0; i < reslist.size(); i++)
+			users.add((String) reslist.get(i) + resenarID.get(i));
+		
+		Disconnect();
+	}
+
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnlog){
+		if (e.getSource() == btnlog) {
 			JFrame fr = new JFrame();
 			fr.pack();
 			fr.setVisible(true);
 			fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			fr.add(new ChoiceTour());
+			try {
+				
+				int index = users.getSelectedIndex();
+				int ID = resenarID.get(index);
+				
+				fr.add(new ChoiceTour(ID));
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			fr.setSize(500, 400);
 		}
 
 	}
-	
-	
+
 	public void start() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		JFrame frame = new JFrame("Bussbolag");
 		frame.pack();
@@ -72,18 +84,46 @@ public class Login extends JPanel implements ActionListener{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new Login());
 		frame.setSize(500, 400);
-		
+
 	}
 
-	public static void main(String args[]) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
+	public static void main(String args[])
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		Login log = new Login();
 		log.start();
 	}
-
-
-
-
 	
+	private void Connect()
+	{
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+		} catch (InstantiationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try {
+			
+			myConn = DriverManager.getConnection("jdbc:mysql://localhost/bussbolag1?user=root&password=");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
-
+	private void Disconnect()
+	{
+		try {
+			myConn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
