@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.mysql.fabric.xmlrpc.base.Data;
@@ -28,6 +29,7 @@ public class ChoiceTour extends JPanel implements ActionListener {
 	Choice clndr = new Choice();
 	Choice ankomlist = new Choice();
 	JLabel showTravel = new JLabel("");
+	JLabel nyrad = new JLabel("-----------------------");
 	JLabel avgar = new JLabel("Avgår från: ");
 	JLabel ankom = new JLabel("Ankommer till: ");
 	JButton btnSearch = new JButton("Sök");
@@ -37,6 +39,7 @@ public class ChoiceTour extends JPanel implements ActionListener {
 	List<Datum> dates;
 	List<Tur> reser = new ArrayList<Tur>();
 	int UserID;
+	int ReseID;
 
 	private class Stad {
 		public int ID;
@@ -55,7 +58,7 @@ public class ChoiceTour extends JPanel implements ActionListener {
 	}
 
 	private class Tur {
-		public int ReseID;
+		public  int ReseID;
 		public String Veckonr;
 		public String Kostnad;
 		public String Forbokning;
@@ -99,6 +102,7 @@ public class ChoiceTour extends JPanel implements ActionListener {
 
 		add(avgar);
 		add(city);
+		add(nyrad);
 		// add(clndr);
 		add(ankom);
 		add(ankomlist);
@@ -170,7 +174,7 @@ public class ChoiceTour extends JPanel implements ActionListener {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ChoiceTour(1));
-		frame.setSize(800, 200);
+		frame.setSize(500, 200);
 
 	}
 
@@ -197,6 +201,7 @@ public class ChoiceTour extends JPanel implements ActionListener {
 					reser.add(tur);
 					for (int i = 0; i < städer.size(); i++) {
 						if (städer.get(i).ID == tur.AnkommerTill)
+							ankomlist.getSelectedItem();
 							ankomlist.add(städer.get(i).Stad);
 					}
 				}
@@ -215,25 +220,29 @@ public class ChoiceTour extends JPanel implements ActionListener {
 		}
 
 		if (e1.getSource() == btnBoka) {
-			try {
-				Connect();
+			Connect();
+			try{
+			PreparedStatement stmt = myConn
+			.prepareStatement("INSERT INTO Bokningar (TurID, ResenarID) VALUES (String, null)");
+			stmt.setInt(1, city.getSelectedIndex() + ankomlist.getSelectedIndex());
+			stmt.setInt(2, UserID);
+			//System.out.println("Avgår Från: " + city.getSelectedItem()+ "\nAnkommer till: "+ ankomlist.getItem(0)+ "\nAnvändar ID: " + );
+			//System.out.println( "Avgår Från: " + city.getSelectedIndex()+ "\nAnkommer till: "+ ankomlist.getSelectedIndex() + "\nAnvändar ID: " + UserID);
+			stmt.execute();
+			
 
-				PreparedStatement stmt = myConn
-						.prepareStatement("INSERT INTO Bokningar (TurID, ResenarID) VALUES (?, ?)");
-				//stmt.setString(1, ankomlist.getItem(UserID) );
-				//stmt.setString(2, "");
-				System.out.println();
-				stmt.execute();
-
-				System.out.println("test");
-
-				Disconnect();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			Disconnect();
+		} 
+		catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 		}
 	}
+
+	
+
+	
 
 	public static void main(String args[])
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
