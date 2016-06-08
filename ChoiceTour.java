@@ -1,11 +1,9 @@
-package Tour;
+package gui;
 
 import java.awt.Choice;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,18 +15,12 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import com.mysql.fabric.xmlrpc.base.Data;
-import com.mysql.jdbc.Statement;
 
 public class ChoiceTour extends JPanel implements ActionListener {
 	Choice city = new Choice();
-	Choice clndr = new Choice();
 	Choice ankomlist = new Choice();
-	JLabel showTravel = new JLabel("");
+	Choice clndr = new Choice();
 	JLabel nyrad = new JLabel("-----------------------");
 	JLabel avgar = new JLabel("Avgår från: ");
 	JLabel ankom = new JLabel("Ankommer till: ");
@@ -57,8 +49,18 @@ public class ChoiceTour extends JPanel implements ActionListener {
 		}
 	}
 
+	private class Bokningar {
+		public int TurID;
+		public int ResenarID;
+
+		public Bokningar(int TurID, int ResenarID) {
+			this.TurID = TurID;
+			this.ResenarID = ResenarID;
+		}
+	}
+
 	private class Tur {
-		public  int ReseID;
+		public int ReseID;
 		public String Veckonr;
 		public String Kostnad;
 		public String Forbokning;
@@ -103,12 +105,10 @@ public class ChoiceTour extends JPanel implements ActionListener {
 		add(avgar);
 		add(city);
 		add(nyrad);
-		// add(clndr);
 		add(ankom);
 		add(ankomlist);
 		add(btnSearch);
 		add(btnBoka);
-		add(showTravel);
 		btnSearch.addActionListener(this);
 		btnBoka.addActionListener(this);
 
@@ -140,13 +140,10 @@ public class ChoiceTour extends JPanel implements ActionListener {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 		} catch (InstantiationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -154,7 +151,6 @@ public class ChoiceTour extends JPanel implements ActionListener {
 
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost/bussbolag1?user=root&password=");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -163,7 +159,6 @@ public class ChoiceTour extends JPanel implements ActionListener {
 		try {
 			myConn.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -174,7 +169,7 @@ public class ChoiceTour extends JPanel implements ActionListener {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ChoiceTour(1));
-		frame.setSize(500, 200);
+		frame.setSize(800, 200);
 
 	}
 
@@ -201,12 +196,12 @@ public class ChoiceTour extends JPanel implements ActionListener {
 					reser.add(tur);
 					for (int i = 0; i < städer.size(); i++) {
 						if (städer.get(i).ID == tur.AnkommerTill)
-							ankomlist.getSelectedItem();
 							ankomlist.add(städer.get(i).Stad);
+						ankomlist.getSelectedItem();
+
 					}
 				}
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -221,28 +216,23 @@ public class ChoiceTour extends JPanel implements ActionListener {
 
 		if (e1.getSource() == btnBoka) {
 			Connect();
-			try{
-			PreparedStatement stmt = myConn
-			.prepareStatement("INSERT INTO Bokningar (TurID, ResenarID) VALUES (String, null)");
-			stmt.setInt(1, city.getSelectedIndex() + ankomlist.getSelectedIndex());
-			stmt.setInt(2, UserID);
-			//System.out.println("Avgår Från: " + city.getSelectedItem()+ "\nAnkommer till: "+ ankomlist.getItem(0)+ "\nAnvändar ID: " + );
-			//System.out.println( "Avgår Från: " + city.getSelectedIndex()+ "\nAnkommer till: "+ ankomlist.getSelectedIndex() + "\nAnvändar ID: " + UserID);
-			stmt.execute();
-			
+			try {
+				ReseID = city.getSelectedIndex() + 1;
+				UserID = ankomlist.getSelectedIndex() + 1;
+				PreparedStatement stmt = myConn.prepareStatement("SET FOREIGN_KEY_CHECKS=0");
+				stmt = myConn.prepareStatement("SET FOREIGN_KEY_CHECKS=1");
+				stmt = myConn.prepareStatement("ALTER TABLE Tur");
+				stmt = myConn.prepareStatement("INSERT INTO Bokningar (TurID, ResenarID) VALUES (?, ?)");
+				stmt.setInt(1, ReseID);
+				stmt.setInt(2, UserID);
+				System.out.println("Resan är bokad");
 
-			Disconnect();
-		} 
-		catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+				Disconnect();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-
-	
-
-	
 
 	public static void main(String args[])
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {

@@ -1,4 +1,4 @@
-package Tour;
+package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Choice;
@@ -39,7 +39,7 @@ public class Login extends JPanel implements ActionListener {
 		add(users, BorderLayout.CENTER);
 		add(btnlog, BorderLayout.SOUTH);
 		btnlog.addActionListener(this);
-		
+
 		Connect();
 		PreparedStatement stmt = myConn.prepareStatement("select ResenarID, Namn from resenar");
 		ResultSet rs = stmt.executeQuery();
@@ -52,7 +52,7 @@ public class Login extends JPanel implements ActionListener {
 
 		for (int i = 0; i < reslist.size(); i++)
 			users.add((String) reslist.get(i) + resenarID.get(i));
-		
+
 		Disconnect();
 	}
 
@@ -63,13 +63,12 @@ public class Login extends JPanel implements ActionListener {
 			fr.setVisible(true);
 			fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			try {
-				
+
 				int index = users.getSelectedIndex();
 				int ID = resenarID.get(index);
-				
+
 				fr.add(new ChoiceTour(ID));
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			fr.setSize(500, 400);
@@ -92,37 +91,30 @@ public class Login extends JPanel implements ActionListener {
 		Login log = new Login();
 		log.start();
 	}
-	
-	private void Connect()
-	{
+
+	private void Connect() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 		} catch (InstantiationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		try {
-			
+
 			myConn = DriverManager.getConnection("jdbc:mysql://localhost/bussbolag1?user=root&password=");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	private void Disconnect()
-	{
+
+	private void Disconnect() {
 		try {
 			myConn.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
